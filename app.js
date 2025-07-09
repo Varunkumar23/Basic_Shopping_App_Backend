@@ -11,7 +11,8 @@ require("./config/db.js");
 // app.use(cors(""));  //this is used to give the access to the front end
 
 app.use(cors({
-  origin: "https://basic-shopping-app-frontend.vercel.app"
+  origin: "https://basic-shopping-app-frontend.vercel.app",
+  new:true,
 }));
 
 app.use(express.json());
