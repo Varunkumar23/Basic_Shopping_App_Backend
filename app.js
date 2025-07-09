@@ -8,7 +8,12 @@ const app = express();
 
 require("./config/db.js");
 
-app.use(cors(""));  //this is used to give the access to the front end
+// app.use(cors(""));  //this is used to give the access to the front end
+
+app.use(cors({
+  origin: "https://basic-shopping-app-frontend.vercel.app"
+}));
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -20,6 +25,8 @@ app.use((req, res, next) => {
 
 app.use("/api/v1", apiRouter);
 
-app.listen("2900", () => {
-  console.log("<====== Server is Running ======>");
-});
+// app.listen("2900", () => {
+//   console.log("<====== Server is Running ======>");
+// });
+
+module.exports = app;
