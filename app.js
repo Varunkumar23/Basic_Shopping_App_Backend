@@ -26,8 +26,8 @@ app.use((req, res, next) => {
 
 app.use("/api/v1", apiRouter);
 
-// app.listen("2900", () => {
-//   console.log("<====== Server is Running ======>");
-// });
+app.listen("2900", () => {
+  console.log("<====== Server is Running ======>");
+});
 
 module.exports = app;
