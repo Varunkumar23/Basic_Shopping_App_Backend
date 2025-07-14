@@ -1,4 +1,7 @@
+const bcrypt = require("bcrypt");
 const { userModel } = require("./user_schema");
+const jwt = require("jsonwebtoken");
+
 const userRegistrationController = async (req, res) => {
   const data = req.body;
 
@@ -12,7 +15,7 @@ const userRegistrationController = async (req, res) => {
     return; //NEVER forgot to write return in such cases!
   }
 
-   try {
+  try {
     const newUser = await userModel.create(data);
     const { password, ...safeData } = newUser._doc;
 
@@ -33,8 +36,64 @@ const userRegistrationController = async (req, res) => {
   }
 };
 
-const userLoginController=(req,res)=>{
-  
-}
+const userLoginController = async (req, res) => {
+  const { email, password } = req.body;
 
-module.exports = { userRegistrationController,userLoginController };
+  console.log(req.body);
+  const data = req.body;
+  if (!data.email || !data.password) {
+    res.status(400).json({
+      isSuccess: false,
+      message: "Email and password are required",
+      data: {},
+    });
+    return;
+  }
+
+  const user = await userModel.findOne({
+    email,
+  });
+
+  if (user == null) {
+    res.status(400).json({
+      isSuccess: false,
+      message: "User does not exist, please register!",
+      data: {},
+    });
+    return;
+  }
+  const hashedPassword = user.password;
+  const isCorrect = await bcrypt.compare(password, hashedPassword);
+
+  if (!isCorrect) {
+    res.status(400).json({
+      isSuccess: false,
+      message: "Password is Incorrect",
+      data: {},
+    });
+    return;
+  } else {
+    const token = jwt.sign(
+      { _id: user._id, email: user.email },
+      process.env.JWT_SECRET
+    );
+
+    res.cookie("authorization", token, {
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: "Strict",
+    });
+
+    res.status(200).json({
+      isSuccess: true,
+      message: "Login Successfull",
+      data: {
+        user: {
+          email: user.email,
+        },
+      },
+    });
+  }
+};
+
+module.exports = { userRegistrationController, userLoginController };
